@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Számkitaláló Játék</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f4f4f9;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Számkitaláló Játék</h1>
+    <p>Gondoltam egy számra 0 és 1 000 000 között. Kitalálod maximum 20 lépésből?</p>
+    
+    <button onclick="startGame()">Játék indítása</button>
+
+    <script>
+        function startGame() {
+            const targetNumber = Math.floor(Math.random() * 1000001);
+            
+            const maxGuesses = 20;
+            let currentGuessCount = 0;
+            let guessedCorrectly = false;
+
+            while (currentGuessCount < maxGuesses && !guessedCorrectly) {
+                let userInput = prompt(`Kérem a tippjét (0 - 1 000 000)! Még ${maxGuesses - currentGuessCount} próbálkozása van.`);
+
+                if (userInput === null) {
+                    alert("Játék megszakítva.");
+                    return; 
+                }
+
+                let guess = parseInt(userInput);
+
+                if (isNaN(guess)) {
+                    alert("Hibás adat! Kérlek, érvényes számot adj meg!");
+                    continue; 
+                }
+
+                currentGuessCount++;
+
+                if (guess === targetNumber) {
+                    alert(`Gratulálok, ${currentGuessCount} lépésből eltaláltad!`);
+                    guessedCorrectly = true; 
+                } else if (guess > targetNumber) {
+                    alert(`${currentGuessCount}. tipp nem talált: A megoldás kisebb.`);
+                } else {
+                    alert(`${currentGuessCount}. tipp nem talált: A megoldás nagyobb.`);
+                }
+            }
+
+            if (!guessedCorrectly) {
+                alert(`Sajnos ez most nem sikerült! A megoldás: ${targetNumber}`);
+            }
+        }
+    </script>
+
+</body>
+</html>
