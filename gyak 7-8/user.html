@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Felhasználói Adatlap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #007bff;
+        }
+        .profile-details p {
+            margin-bottom: 8px;
+        }
+        .profile-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-badge {
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="user-search.html">Vissza a keresőhöz</a>
+    </nav>
+
+    <div class="container">
+        <h1>Felhasználói Adatlap</h1>
+        
+        <div id="profile-container">
+            <p>Adatok betöltése...</p>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('id');
+
+        const profileContainer = document.getElementById('profile-container');
+
+        if (!username) {
+            profileContainer.innerHTML = '<div class="card"><p style="color: red;">Hiba: Nem adtál meg felhasználónevet (id) az URL-ben!</p></div>';
+        } else {
+            const apiUrl = `https://api.github.com/users/${username}`;
+
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Felhasználó nem található vagy hálózati hiba.');
+                    }
+                    return response.json();
+                })
+                .then(user => {
+                    let html = '<div class="card">';
+                    
+                    html += '<div class="profile-header">';
+                    
+                    if (user.avatar_url) {
+                        html += `<img src="${user.avatar_url}" alt="Profilkép" class="profile-avatar">`;
+                    }
+                    
+                    html += '<div>';
+                    
+                    if (user.name !== null && user.name !== "") {
+                        html += `<h2>${user.name}</h2>`;
+                    } else {
+                        html += `<h2>${user.login}</h2>`; 
+                    }
+
+                    html += '</div></div>'; 
+
+                    html += '<div class="profile-details">';
+
+                    if (user.bio !== null && user.bio !== "") {
+                        html += `<p><strong>Bio:</strong> ${user.bio}</p>`;
+                    }
+
+                    if (user.location !== null && user.location !== "") {
+                        html += `<p><strong>Helyszín:</strong> ${user.location}</p>`;
+                    }
+
+                    if (user.blog !== null && user.blog !== "") {
+                        let blogUrl = user.blog.startsWith('http') ? user.blog : `https://${user.blog}`;
+                        html += `<p><strong>Blog:</strong> <a href="${blogUrl}" target="_blank">${user.blog}</a></p>`;
+                    }
+
+                    html += '</div>'; 
+
+                    html += '<div class="profile-stats">';
+                    
+                    if (user.public_repos !== null && user.public_repos !== "") {
+                        html += `<span class="stat-badge">Nyilvános repók: ${user.public_repos}</span>`;
+                    }
+
+                    if (user.followers !== null && user.followers !== "") {
+                        html += `<span class="stat-badge">Követők: ${user.followers}</span>`;
+                    }
+
+                    html += '</div>'; 
+                    html += '</div>'; 
+
+                   
+                    profileContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Hiba:', error);
+                    profileContainer.innerHTML = `<div class="card"><p style="color: red;">A(z) "${username}" nevű felhasználó nem található.</p></div>`;
+                });
+        }
+    </script>
+</body>
+</html>
